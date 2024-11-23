@@ -28,12 +28,12 @@ const generateReport = async (req, res, next) => {
     }
 
     // Insert the order details into the database
-    const query = "INSERT INTO bill (name, uuid, email, contactNumber, paymentMethod, total, productDetails, createdBy) VALUES (?,?,?,?,?,?,?,?)";
+    const query = "INSERT INTO bill (name, uuid, email, contact, paymentMethod, total, productDetails, createdBy) VALUES (?,?,?,?,?,?,?,?)";
     const [result] = await db_connection.query(query, [
         orderDetails.name,
         generatedUuid,
         orderDetails.email,
-        orderDetails.contactNumber,
+        orderDetails.contact,
         orderDetails.paymentMethod,
         orderDetails.totalAmount,
         orderDetails.productDetails,
@@ -55,7 +55,7 @@ const generateReport = async (req, res, next) => {
                 productDetails: productDetailsReport,
                 name: orderDetails.name,
                 email: orderDetails.email,
-                contactNumber: orderDetails.contactNumber,
+                contact: orderDetails.contact,
                 paymentMethod: orderDetails.paymentMethod,
                 totalAmount: orderDetails.totalAmount
             }
@@ -99,7 +99,7 @@ const getPdf = async  (req, res, next ) => {
                     productDetails: productDetailsReport,
                     name: orderDetails.name,
                     email: orderDetails.email,
-                    contactNumber: orderDetails.contactNumber,
+                    contact: orderDetails.contact,
                     paymentMethod: orderDetails.paymentMethod,
                     totalAmount: orderDetails.totalAmount
                 }

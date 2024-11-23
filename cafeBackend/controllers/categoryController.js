@@ -6,24 +6,24 @@ import config from '../auth.js';
 
 
 const addCategory = async (req, res) => {// Log the whole request body
-    let category = req.body.category; // Get the category object from the body
+    let category = req.body;// Get the category object from the body
     console.log(category); 
 // Log the category object
 
     try {
         // Assuming you're passing 'category.name' from the body
         const query = "INSERT INTO category (name) VALUES(?)";
-        const [result] = await db_connection.query(query,[category]);
+        const [result] = await db_connection.query(query,category.name);
 
         if(result.length === 0) {
             return res.status(404).json({
                 message : "no category was inserted"
             })
         }
-
+        
         console.log(result);  // Log the result of the query
 
-        return res.status(200).json({ message: "Category added successfully" });
+        return res.status(200).json([result]);
     } catch (err) {
         console.log("Error adding category:", err);
         return res.status(500).json({ error: "Internal server error" });
@@ -40,9 +40,7 @@ const selectCategories = async (req, res, next) => {
                 message : "no categories has been found"
             })
         }
-        return res.status(201).json({
-            message : result
-        })
+        return res.status(201).json(result)
 
     }
     catch(error) {
@@ -57,9 +55,10 @@ const selectCategories = async (req, res, next) => {
 const updateCategory = async (req, res, next) => {
 
     let category = req.body;
+    console.log(category);
     try {
         var query = "update category set name=? where id=?";
-        const [result] = await db_connection.query(query, [category.category, category.id]);
+        const [result] = await db_connection.query(query, [category.name, category.id]);
 
         if(result.affectedRows === 0) {
             return res.status(404).json({

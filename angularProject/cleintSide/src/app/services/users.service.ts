@@ -41,4 +41,12 @@ export class UsersService {
        `${this.url}/auth/checkToken`
     )
   }
+
+  changePassword(data:any){
+    return this.httpClient.post(
+      `${this.url}/auth/changePassword`,data, {
+        headers : new HttpHeaders().set('Content-Type','application/json')
+      }
+    )
+  }
 }

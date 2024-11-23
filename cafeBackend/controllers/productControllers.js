@@ -37,25 +37,26 @@ const selectProducts = async (req, res, next) => {
         var query = "select p.id, p.name, p.description, p.status, p.price, c.id as categoryId,c.name as categoryName from product as p JOIN category as c  where p.categoryId=c.id";
         const [result] = await db_connection.query(query);
 
-        if(result.length == 0){
-            res.status(404).json({
-                message : "No product was found"
-            })
+        // Check if no products are found
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "No product was found"
+            });
         }
 
-        return res.status(201).json({
-            message : result
-        })
-    }
-    catch(error) {
-        res.status(500).json({
-            message : "INTERNAL SERVER ERROR",
-            error : error.message
-        })
+        // Send the result if products are found
+        return res.status(200).json(result);
+    } catch (error) {
+        // Catch and handle errors
+        return res.status(500).json({
+            message: "INTERNAL SERVER ERROR",
+            error: error.message
+        });
     }
 }
+
 const selectProductById = async (req, res, next) => {
-    const id = req.params.id;
+    const {id} = req.params;
 
     try {
         const query = "SELECT id, name, description, price from product where id = ? ",
@@ -66,9 +67,7 @@ const selectProductById = async (req, res, next) => {
                 message : "no product was found"
             })
         }
-        return res.status(201).json({
-            message : result
-        })
+        return res.status(201).json(result)
     }
     catch (error) {
         return res.status(500).json({
@@ -90,9 +89,7 @@ const updateProduct = async (req, res, next) => {
                 message : "something went wrong"
             })
         }
-        return res.status(201).json({
-            message : "product updated succesfuly"
-        })
+        return res.status(201).json("product updated succesfuly")
     }
     catch(error) {
         return res.status(500).json({
@@ -113,9 +110,7 @@ const deleteProduct = async (req, res, next) => {
                 message : "id not found"
             })
         }
-        return res.status(201).json({
-            message : "product deleted successfully"
-        })
+        return res.status(201).json("product deleted successfully")
     }
     catch(error) {
         res.status(500).json({
@@ -136,10 +131,7 @@ const updateStatus = async (req, res, next) => {
             })
         }
 
-        return res.status(201).json({
-            message : "product status updated succesfully",
-            message : result
-        })
+        return res.status(201).json("product status updated succesfully")
     }
     catch(error) {
         return res.status(500).json({
@@ -148,4 +140,24 @@ const updateStatus = async (req, res, next) => {
         })
     }
 }
-export default {addProduct, selectProducts, selectProductById, updateProduct, deleteProduct, updateStatus}
+
+
+const getProductByCategory = async (req, res) => {
+    const { categoryId } = req.params;
+
+    try {
+        const query = "SELECT * FROM product WHERE categoryId = ?";
+        const [results] = await db_connection.query(query,categoryId);
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No products found for this category.' });
+        }
+
+        res.status(200).json(results);
+    } catch (err) {
+        console.error('Error fetching products:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+export default {addProduct, selectProducts, selectProductById, updateProduct, deleteProduct, updateStatus, getProductByCategory}

@@ -11,4 +11,5 @@ productRoute.get('/getById/:id',auth.authenticateToken, role.checkRole, productC
 productRoute.patch('/updateProduct', auth.authenticateToken, role.checkRole, productControllers.updateProduct);
 productRoute.delete('/delete/:id', auth.authenticateToken, role.checkRole, productControllers.deleteProduct);
 productRoute.patch('/updateStatus', auth.authenticateToken, role.checkRole, productControllers.updateStatus);
+productRoute.get('/category/:categoryId',auth.authenticateToken, role.checkRole, productControllers.getProductByCategory);
 export default productRoute

@@ -6,4 +6,8 @@ export class globalConstants  {
     public static emailRegex :string = "[A-Za-z0-9._%-]+@[A-Za-z0-9._%-]+\\.[a-z]{2,3}";
     public static contactNumber : string = "^[e0-9]{10,10}$";
     public static error : string = "error";
+
+    public static productExitError : string = "product already exist";
+    public static productAdded : string = "product added succesfully";
+
 }
