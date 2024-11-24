@@ -5,30 +5,37 @@ import config from '../auth.js';
 
 
 
-const addCategory = async (req, res) => {// Log the whole request body
-    let category = req.body;// Get the category object from the body
+const addCategory = async (req, res) => {
+    const category = req.body; // Expecting category.name from the request body
     console.log(category); 
-// Log the category object
 
     try {
-        // Assuming you're passing 'category.name' from the body
         const query = "INSERT INTO category (name) VALUES(?)";
-        const [result] = await db_connection.query(query,category.name);
+        const [result] = await db_connection.query(query, [category.name]); // Use square brackets for parameterized query
 
-        if(result.length === 0) {
+        // Check if the insertion was successful
+        if (result.affectedRows === 0) {
             return res.status(404).json({
-                message : "no category was inserted"
-            })
+                message: "No category was inserted",
+            });
         }
-        
-        console.log(result);  // Log the result of the query
 
-        return res.status(200).json([result]);
+        // Successful insertion
+        return res.status(200).json({
+            message: "Category added successfully",
+            data: result, // Optionally include result for debugging or further use
+        });
     } catch (err) {
-        console.log("Error adding category:", err);
-        return res.status(500).json({ error: "Internal server error" });
+        console.error("Error adding category:", err);
+
+        // Return internal server error
+        return res.status(500).json({
+            message: "Internal server error",
+            error: err.message,
+        });
     }
 };
+
 
 const selectCategories = async (req, res, next) => {
     try {
@@ -36,7 +43,7 @@ const selectCategories = async (req, res, next) => {
         const [result] = await db_connection.query(query);
 
         if(result.length === 0) {
-            return res.status(401).json({
+            return res.status(404).json({
                 message : "no categories has been found"
             })
         }
@@ -77,4 +84,33 @@ const updateCategory = async (req, res, next) => {
         })
     }
 }
-export default {addCategory, selectCategories, updateCategory}
+
+
+const deleteCategory = async (req, res, next) => {
+    const categoryId = req.params.id; // Capture the ID from the URL
+
+    try {
+        const query = "DELETE FROM category WHERE id = ?";
+        const [result] = await db_connection.query(query, [categoryId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "ID not found",
+            });
+        }
+
+        return res.status(200).json({
+             message : "Category deleted successfully"},
+        );
+    } catch (error) {
+        console.error("Database error:", error.message);
+
+        // If an error occurs, send a 500 response
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message,
+        });
+    }
+};
+
+export default {addCategory, selectCategories, updateCategory,deleteCategory}

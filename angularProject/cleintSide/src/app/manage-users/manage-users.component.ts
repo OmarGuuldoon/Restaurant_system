@@ -59,26 +59,23 @@ export class ManageUsersComponent implements OnInit{
   }
 
 
-  handleChangeAction(status:any,id:any){
-    var data = {
-      status : status.toString(),
-      id:id
-    }
+  handleChangeAction(status: boolean, id: number) {
+    const data = {
+        status: status ? "true" : "false", // Map boolean to meaningful values
+        id: id,
+    };
+
     this.userService.updateUsers(data).subscribe({
-      next : (response : any) =>{
-        this.ngxService.stop();
-        this.responseMessage = response?.message;
-        this.snackbar.openSnackBar(this.responseMessage,"success");
-      }, error : (error:any) =>{
-        if(error.error?.message){
-          this.responseMessage =error.error?.message;
-        }
-        else{
-          this.responseMessage = globalConstants.genericError;
-        }
-        this.snackbar.openSnackBar(this.responseMessage,globalConstants.error);
-      }
-    })
-  }
+        next: (response: any) => {
+            this.snackbar.openSnackBar(response?.message, "success");
+        },
+        error: (error: any) => {
+            const errorMessage =
+                error.error?.message || globalConstants.genericError;
+            this.snackbar.openSnackBar(errorMessage, globalConstants.error);
+        },
+    });
+}
+
 }
 

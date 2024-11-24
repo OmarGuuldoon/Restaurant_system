@@ -75,7 +75,7 @@ export class ManageProductsComponent implements OnInit {
     dialogConfig.width = "850px";
     const dailogRef = this.dialog.open(ProductComponent,dialogConfig);
     this.router.events.subscribe({
-      next : (response : any) =>{
+      next : () =>{
         dailogRef.close();
       }
     });
@@ -92,6 +92,7 @@ export class ManageProductsComponent implements OnInit {
       action : "Edit",
       data : values,
     }
+
     dialogConfig.width = "850px";
     const dailogRef = this.dialog.open(ProductComponent,dialogConfig);
     this.router.events.subscribe({
@@ -110,7 +111,7 @@ export class ManageProductsComponent implements OnInit {
   deleteEditAction(values:any){
     const dailogConfig = new MatDialogConfig;
     dailogConfig.data = {
-      message : "delete" +values.name+"product"
+      message : "delete " +values.name+" from products"
     }
     const dialogRef =this.dialog.open(ConfirmLogoutDailogComponent,dailogConfig);
     const sub = dialogRef.componentInstance.onEmitStatusChange.subscribe({

@@ -16,10 +16,6 @@ export const routes: Routes = [
   {
     path: 'cafe',
     component: FullComponent,
-        canActivate :[RouteGuardServiceService],
-        data : {
-            expectedRole : ['admin','user'],
-        } ,
     children: [
       {
         path: 'dashboard',
@@ -27,25 +23,32 @@ export const routes: Routes = [
       },
       {
         path: 'categories',
-        component :ManageCategoryComponent
+        component: ManageCategoryComponent,
+        canActivate: [RouteGuardServiceService],
+        data: { expectedRole: ['admin'] },
       },
       {
         path: 'products',
-        component :ManageProductsComponent
+        component: ManageProductsComponent,
+        canActivate: [RouteGuardServiceService],
+        data: { expectedRole: ['admin'] },
       },
       {
         path: 'orders',
-        component :ManageOrdersComponent
+        component: ManageOrdersComponent,
       },
       {
         path: 'bills',
-        component :ManageBillsComponent
+        component: ManageBillsComponent,
       },
       {
         path: 'users',
-        component :ManageUsersComponent
+        component: ManageUsersComponent,
+        canActivate: [RouteGuardServiceService],
+        data: { expectedRole: ['admin'] },
       },
     ],
   },
   { path: '**', component: HomeComponentComponent }, // Catch-all route
 ];
+

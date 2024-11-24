@@ -89,7 +89,7 @@ const updateProduct = async (req, res, next) => {
                 message : "something went wrong"
             })
         }
-        return res.status(201).json("product updated succesfuly")
+        return res.status(201).json({message :"product updated succesfuly"})
     }
     catch(error) {
         return res.status(500).json({
@@ -110,7 +110,7 @@ const deleteProduct = async (req, res, next) => {
                 message : "id not found"
             })
         }
-        return res.status(201).json("product deleted successfully")
+        return res.status(201).json({ message : "product deleted successfully"})
     }
     catch(error) {
         res.status(500).json({
@@ -131,7 +131,7 @@ const updateStatus = async (req, res, next) => {
             })
         }
 
-        return res.status(201).json("product status updated succesfully")
+        return res.status(201).json({ message :"product status updated succesfully"})
     }
     catch(error) {
         return res.status(500).json({

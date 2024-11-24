@@ -10,6 +10,7 @@ import { MaterialModule } from '../shared/material.module';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CategoryComponent } from '../dailog/category/category.component';
+import { ConfirmLogoutDailogComponent } from '../dailog/confirm-logout-dailog/confirm-logout-dailog.component';
 
 
 @Component({
@@ -41,27 +42,27 @@ export class ManageCategoryComponent implements OnInit {
     this.tableData();
   }
 
-  tableData() {
+  tableData(){
     this.categoryService.getCategories().subscribe({
-      next: (response: any) => {
+      next : (response : any) =>{
         this.ngxService.stop();
         this.dataSource = new MatTableDataSource(response);
-        console.log(this.dataSource);
       },
-      error: (error: any) => {
+      error : (error : any) => {
         this.ngxService.stop();
-        if (error.error?.message) {
+        if(error.error?.message){
           this.responseMessage = error.error?.message;
+
         }
         else {
           this.responseMessage = globalConstants.genericError
         }
-      },
-      complete: () => {
-        this.snackbarService.openSnackBar(this.responseMessage, globalConstants.error);
+        this.snackbarService.openSnackBar(this.responseMessage,globalConstants.error)
       }
+
     })
   }
+  
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -104,5 +105,39 @@ export class ManageCategoryComponent implements OnInit {
     })
   }
  
+
+  deleteEditAction(values:any){
+    const dailogConfig = new MatDialogConfig;
+    dailogConfig.data = {
+      message : "delete " +values.name+" from category"
+    }
+    const dialogRef =this.dialog.open(ConfirmLogoutDailogComponent,dailogConfig);
+    const sub = dialogRef.componentInstance.onEmitStatusChange.subscribe({
+      next : (response : any) => {
+        this. ngxService.start();
+        this.deleteProduct(values.id);
+        dialogRef.close();
+      }
+    })
+  }
+
+  deleteProduct(id:any){
+    this.categoryService.deleteCategory(id).subscribe({
+      next : (response : any) =>{
+        this.ngxService.stop();
+        this.tableData();
+        this.responseMessage = response?.message ;
+        this.snackbarService.openSnackBar(this.responseMessage,'success');
+      },error : (error:any) =>{
+        if(error.error?.message){
+          this.responseMessage =error.error?.message;
+        }
+        else{
+          this.responseMessage =globalConstants.genericError;
+        }
+        this.snackbarService.openSnackBar(this.responseMessage,globalConstants.error);
+      }
+    })
+  }
 
 }

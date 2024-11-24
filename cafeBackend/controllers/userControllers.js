@@ -12,7 +12,7 @@ const userRegistration = async (req, res) => {
     let email = req.body.email;
     let confirmPassword = req.body.confirmPassword;
     let password = req.body.password;
-    let contactNumber = req.body.contactNumber;
+    let contact = req.body.contact;
     let status = req.body.status;
     let role = req.body.role;
     console.log("Recieved Signup Request : ");
@@ -34,8 +34,8 @@ const userRegistration = async (req, res) => {
 
         password = bcrypt.hashSync(req.body.password,8);
         console.log("User not Found, Registering New User");
-        const insertionQuery = "INSERT INTO user (name, contactNumber, email, password, status, role) VALUES (?,?,?,?,'false','user')";
-        await db_connection.query(insertionQuery, [username, contactNumber, email, password, status, role]);
+        const insertionQuery = "INSERT INTO user(name, contact, email, password, status, role) VALUES(?,?,?,?,'false','user')";
+        await db_connection.query(insertionQuery, [username, contact, email, password, status, role]);
 
         console.log("User Registered Succesfully");
         return res.status(201).json({
@@ -52,6 +52,8 @@ const userRegistration = async (req, res) => {
     }
 }
 
+
+
 const userLogin = async (req, res) => {
     let user = req.body;
     console.log("Received Login Credentials:", user);
@@ -59,6 +61,11 @@ const userLogin = async (req, res) => {
     try {
         const userQuery = "SELECT id, email, password, role, status FROM user WHERE email = ?";
         const [result] = await db_connection.query(userQuery, [user.email]);
+
+        if (result.length === 0) {
+            console.log("Email not found");
+            return res.status(404).json({ message: "Email not found. Please sign up." });
+        }
 
         const passwordIsValid = bcrypt.compareSync(req.body.password, result[0].password);
 
@@ -68,15 +75,11 @@ const userLogin = async (req, res) => {
             return res.status(401).json({ message: "Incorrect Credentials" });
         }
 
-        if (result[0].status === false || result[0].status.trim() === 'false') {
+        if (!result[0].status || result[0].status.trim() === 'false') {
             console.log("Wait for Admin Approval: User status is false");
             return res.status(401).json({ message: "Wait for Admin Approval..." });
-            console.log("User status:", result[0].status, typeof result[0].status);
-
         }
 
-        
-        console.log("JWT_SECRET:", process.env.JWT_SECRET);
         const accessToken = jwt.sign(
             {
                 id: result[0].id,
@@ -108,6 +111,7 @@ const userLogin = async (req, res) => {
     }
 };
 
+
 var transporter = nodemailer.createTransport({
     service : "gmail",
     auth : {
@@ -116,44 +120,58 @@ var transporter = nodemailer.createTransport({
     }
 })
 
-const forgotPassword = async (req ,res) => {
+const forgotPassword = async (req, res) => {
     const user = req.body;
     try {
-         checkEmailQuery = "SELECT email FROM user WHERE email = ?"; 
-        [result] = await db_connection.query(checkEmailQuery, user.email);   
-
-        if(!checkEmailQuery) {
+        const checkEmailQuery = "SELECT email, password FROM user WHERE email = ?"; 
+        const [result] = await db_connection.query(checkEmailQuery, [user.email]);   
+        
+        // Validate if the email exists in the database
+        if (!result || result.length === 0) {
             console.log("Email not Found, Please sign up");
             return res.status(401).json({
-                message : "Email was not found Pleas sign up.. "
-            })
+                message: "Email was not found. Please sign up."
+            });
         }
 
-        var mailOptions = {
-            from : process.env.EMAIL,
-            to : result[0].email,
-            subject : 'Password cafe managment System',
-            html : '<p><b>Your log in details for cafe managment system</b> <br><b>'  +result[0].email + ' </b> ' + result[0].password + '<br> <a> href="http://localhost:3025/"/>Click Here to Login</a></p>',
+        // Set up mail options
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: result[0].email,
+            subject: 'Password for Cafe Management System',
+            html: `<p><b>Your login details for Cafe Management System:</b><br>
+                   Email: <b>${result[0].email}</b><br>
+                   Password: <b>${result[0].password}</b><br>
+                   <a href="http://localhost:3025/">Click Here to Login</a></p>`,
         };
-        transporter.sendMail({
-            mailOptions
+
+        // Send the email
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error("Error sending email:", error);
+                return res.status(500).json({
+                    message: "Failed to send email."
+                });
+            }
+            console.log("Email Sent:", info.response);
+            res.status(200).json({
+                message: "Password sent to your email."
+            });
         });
-        console.log("Email Sent : "); 
-
-
-    }
-    catch (err) {
-        console.log("INTERNAL SERVER ERRROR!");
+    } catch (err) {
+        console.error("INTERNAL SERVER ERROR:", err);
         return res.status(500).json({
-            message : "INTERNAL SERVER ERROR!"
-        })
+            message: "INTERNAL SERVER ERROR!"
+        });
     }
-}
+};
+
+
 const getUsersByRole = async (req, res) => {
     const role = req.query.role || 'user';  // Set 'user' as the default role
 
     try {
-        const query = "SELECT id, name, email, contactnumber, status FROM user WHERE role = ?";
+        const query = "SELECT id, name, email, contact, status FROM user WHERE role = ?";
         const [results] = await db_connection.query(query, [role]);
 
         if (results.length === 0) {
@@ -187,36 +205,30 @@ const getUsers = async (req, res) => {
 };
 
 
-const updateStatus = async (req, res, next) => {
-    let user = req.body;
-    try {
-        var query = "update user set status = ? where id = ?";
-        const [result] = await db_connection.query(query, [user.status, user.id]);
+const updateUserStatus = async (req, res) => {
+    const { id, status } = req.body;
 
-        if(result.affectedRows === 0) {
-            return res.status(404).json({
-                message : "status id was not found"
-            })
+    try {
+        const updateQuery = "UPDATE user SET status = ? WHERE id = ?";
+        const result = await db_connection.query(updateQuery, [status, id]);
+
+        if (result[0].affectedRows === 0) {
+            return res.status(404).json({ message: "User ID does not exist" });
         }
 
-        return res.status(201).json("Status updated succesfully")
+        return res.status(200).json({ message: "User status updated successfully" });
+    } catch (error) {
+        console.error("INTERNAL SERVER ERROR:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
-    catch(error) {
-        return res.status(500).json({
-            message : "internal server error",
-            error : error.message
-        })
-    }
-}
+};
+
 
 
 const updateUser = async (req, res) => {
     const user = req.body;
     try {
-        // Ensure the query matches the fields you intend to update
         const updateQuery = "UPDATE user SET name = ?, email = ?, password = ?, status = ?, role = ? WHERE id = ?";
-        
-        // Remove the extra 'user.contactNumber' in the values array
         const result = await db_connection.query(updateQuery, [user.name, user.email, user.password, user.status, user.role, user.id]);
 
         // Check if any rows were affected
@@ -228,7 +240,6 @@ const updateUser = async (req, res) => {
 
         return res.status(200).json(result);
     } catch (error) {
-        // Log the error for debugging purposes
         console.error("INTERNAL SERVER ERROR:", error);
         return res.status(500).json({
             message: "Internal server error"
@@ -288,4 +299,4 @@ const changePassword = async (req, res) => {
 };
 
 
-export default { updateStatus,userRegistration, userLogin, forgotPassword, updateUser, checkToken, getUsersByRole, changePassword, getUsers};
+export default {updateUserStatus,userRegistration, userLogin, forgotPassword, updateUser, checkToken, getUsersByRole, changePassword, getUsers};

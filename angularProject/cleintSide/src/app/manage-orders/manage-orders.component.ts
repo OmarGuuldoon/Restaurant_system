@@ -178,7 +178,10 @@ export class ManageOrdersComponent implements OnInit {
     this.dataSource = [...this.dataSource];
     this.snackbar.openSnackBar(globalConstants.productAdded,"success");   
     }
-    this.snackbar.openSnackBar(globalConstants.productExitError,globalConstants.error);   
+    else {
+      this.snackbar.openSnackBar(globalConstants.productExitError,globalConstants.error);   
+    }
+    
   }
 
   handleDeleteAction(value :any, element : any){

@@ -33,4 +33,10 @@ export class CategoryService {
       `${this.url}/categories/categories`
     )
   }
+
+  deleteCategory(id:any){
+    return this.httpClient.delete(
+      `${this.url}/categories/deleteCategory/${id}`
+    )
+  }
 }

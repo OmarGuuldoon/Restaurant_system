@@ -45,12 +45,15 @@ export class ProductComponent  implements OnInit{
         description : [null, [Validators.required]],
       });
 
-      if(this.dialogAction.action === "Edit"){
-        this.dialogAction = "Edit",
-        this.action = "Update",
+      this.dialogAction = this.dialogData.action; // Use the dialogData action directly
+    this.action = this.dialogAction === "Edit" ? "Update" : "Add";
+
+    // Patch form values if editing
+    if (this.dialogAction === "Edit") {
         this.productForm.patchValue(this.dialogData.data);
-      }
-      this.getCategories();
+    }
+
+    this.getCategories();
   }
 
 
