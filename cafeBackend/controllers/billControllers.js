@@ -135,9 +135,9 @@ const getBills = async (req, res , next) => {
                 message : "no bills were found"
             })
         }
-        return res.status(201).json({
+        return res.status(201).json(
             result
-        })
+        )
     }
     catch(error){
         return res.status(500).json({

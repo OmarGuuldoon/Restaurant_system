@@ -49,4 +49,18 @@ export class UsersService {
       }
     )
   }
+
+  getUsers(){
+    return this.httpClient.get(
+      `${this.url}/auth/users`
+    )
+  }
+
+  updateUsers(data:any){
+    return this.httpClient.patch(
+      `${this.url}/auth/updateStatus`,data , {
+        headers : new HttpHeaders().set('Content-Type',"application/json")
+      }
+    )
+  }
 }

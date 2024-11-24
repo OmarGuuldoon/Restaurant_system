@@ -7,6 +7,8 @@ import { RouteGuardServiceService } from './services/route-guard-service.service
 import { ManageCategoryComponent } from './manage-category/manage-category.component';
 import { ManageProductsComponent } from './manage-products/manage-products.component';
 import { ManageOrdersComponent } from './manage-orders/manage-orders.component';
+import { ManageBillsComponent } from './manage-bills/manage-bills.component';
+import { ManageUsersComponent } from './manage-users/manage-users.component';
 
 
 export const routes: Routes = [
@@ -34,6 +36,14 @@ export const routes: Routes = [
       {
         path: 'orders',
         component :ManageOrdersComponent
+      },
+      {
+        path: 'bills',
+        component :ManageBillsComponent
+      },
+      {
+        path: 'users',
+        component :ManageUsersComponent
       },
     ],
   },

@@ -11,9 +11,9 @@ const MENUITEMS = [
     {state:'dashboard',name:'Dashboard',icon:'dashboard',role:''},
     {state:'categories',name:'Manage Category',icon:'category', role:'admin'},
     {state:'products',name:'Manage Products',icon:'inventory_2', role:'admin'},
-    {state:'orders',name:'Manage Orders',icon:'list_alt', role:'admin'},
-    {state:'bills',name:'Manage Bills',icon:'invioce', role:'admin'},
-    {state:'user',name:'Manage Users',icon:'user', role:'admin'}
+    {state:'orders',name:'Manage Orders',icon:'list_alt', role:''},
+    {state:'bills',name:'Manage Bills',icon:'import_contacts', role:''},
+    {state:'users',name:'Manage Users',icon:'people', role:'admin'}
 ]
 
 @Injectable()

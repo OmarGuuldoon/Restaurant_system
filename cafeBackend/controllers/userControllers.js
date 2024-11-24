@@ -166,6 +166,50 @@ const getUsersByRole = async (req, res) => {
         return res.status(500).json({ error: 'Database error' });
     }
 };
+
+
+const getUsers = async (req, res) => {
+
+
+    try {
+        const query = "SELECT * FROM user";
+        const [results] = await db_connection.query(query);
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: `No users found with role ${role}` });
+        }
+
+        return res.status(200).json(results);
+    } catch (err) {
+        console.error('Error executing query:', err);
+        return res.status(500).json({ error: 'Database error' });
+    }
+};
+
+
+const updateStatus = async (req, res, next) => {
+    let user = req.body;
+    try {
+        var query = "update user set status = ? where id = ?";
+        const [result] = await db_connection.query(query, [user.status, user.id]);
+
+        if(result.affectedRows === 0) {
+            return res.status(404).json({
+                message : "status id was not found"
+            })
+        }
+
+        return res.status(201).json("Status updated succesfully")
+    }
+    catch(error) {
+        return res.status(500).json({
+            message : "internal server error",
+            error : error.message
+        })
+    }
+}
+
+
 const updateUser = async (req, res) => {
     const user = req.body;
     try {
@@ -182,9 +226,7 @@ const updateUser = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
-            message: "User updated successfully"
-        });
+        return res.status(200).json(result);
     } catch (error) {
         // Log the error for debugging purposes
         console.error("INTERNAL SERVER ERROR:", error);
@@ -246,4 +288,4 @@ const changePassword = async (req, res) => {
 };
 
 
-export default { userRegistration, userLogin, forgotPassword, updateUser, checkToken, getUsersByRole, changePassword};
+export default { updateStatus,userRegistration, userLogin, forgotPassword, updateUser, checkToken, getUsersByRole, changePassword, getUsers};

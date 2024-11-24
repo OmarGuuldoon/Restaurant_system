@@ -31,4 +31,18 @@ export class BillService {
       }
     )
   }
+
+  getBills(){
+    return this.httpClient.get(
+      `${this.url}/bill/getBills`
+    )
+  }
+
+  deleteBill(id:any){
+    return this.httpClient.delete(
+      `${this.url}/bill/deleteBill/${id}`, {
+        headers : new HttpHeaders().set('Content-Type',"application/json")
+      }
+    )
+  }
 }

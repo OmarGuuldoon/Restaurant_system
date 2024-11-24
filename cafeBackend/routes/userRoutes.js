@@ -13,5 +13,7 @@ userRoutes.patch('/updateUser', userControllers.updateUser);
 userRoutes.get('/checkToken', auth.authenticateToken, userControllers.checkToken);
 userRoutes.get('/getUserByRole', auth.authenticateToken, userControllers.getUsersByRole);
 userRoutes.post('/changePassword', auth.authenticateToken, userControllers.changePassword);
+userRoutes.get('/users', auth.authenticateToken, userControllers.getUsers);
+userRoutes.patch('/updateStatus', auth.authenticateToken, checkRole.checkRole, userControllers.updateStatus);
 
 export default userRoutes;
