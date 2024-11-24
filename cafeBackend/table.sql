@@ -1,7 +1,7 @@
 create table user (
     id int primary key AUTO_INCREMENT,
     name varchar(250),
-    contactNumber varchar(20),
+    contact varchar(20),
     email varchar(50),
     password varchar(250),
     status varchar(50),
@@ -33,7 +33,7 @@ create table bill (
     uuid varchar(200) NOT NULL,
     name varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
-    contactNumber varchar(20) NOT NULL,
+    contact varchar(20) NOT NULL,
     paymentMethod varchar(50) NOT NULL,
     total int NOT NULL,
     productDetails JSON DEFAULT NULL,
